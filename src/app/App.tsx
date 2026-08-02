@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import {
   Menu, X, ChevronRight, Phone, Mail, MapPin, Clock,
   Shield, Zap, Droplets, Sparkles, Car, CheckCircle,
-  AlertCircle, Printer, ArrowRight, Star, ExternalLink,
+  AlertCircle, ArrowRight, Star, ExternalLink,
   Camera, MessageSquare, TrendingUp, Users, Eye,
 } from "lucide-react";
 
@@ -10,7 +10,7 @@ import {
 const SERVICES = [
   {
     id: "wash-wax",
-    icon: <Droplets size={22} />,
+    icon: <Droplets size={24} />,
     name: "Exterior Wash & Wax",
     desc: "Hand wash, clay bar, iron decontamination, and carnauba wax for a deep, wet shine.",
     price: "From $120",
@@ -19,7 +19,7 @@ const SERVICES = [
   },
   {
     id: "interior",
-    icon: <Sparkles size={22} />,
+    icon: <Sparkles size={24} />,
     name: "Interior Detail",
     desc: "Full vacuum, steam clean, leather conditioning, and odor elimination — every surface, every crevice.",
     price: "From $150",
@@ -28,7 +28,7 @@ const SERVICES = [
   },
   {
     id: "paint-correction",
-    icon: <Shield size={22} />,
+    icon: <Shield size={24} />,
     name: "Paint Correction",
     desc: "Machine polish to eliminate swirl marks, light scratches, water spots, and oxidation.",
     price: "From $350",
@@ -37,7 +37,7 @@ const SERVICES = [
   },
   {
     id: "ceramic",
-    icon: <Zap size={22} />,
+    icon: <Zap size={24} />,
     name: "Ceramic Coating",
     desc: "9H ceramic coating bonded to the paint for years of hydrophobic protection and gloss.",
     price: "From $800",
@@ -46,7 +46,7 @@ const SERVICES = [
   },
   {
     id: "full-detail",
-    icon: <Car size={22} />,
+    icon: <Car size={24} />,
     name: "Full Detail Package",
     desc: "Our most comprehensive package — exterior and interior combined for a complete transformation.",
     price: "From $250",
@@ -181,11 +181,11 @@ const NAV_LINKS = [
 ];
 
 /* ── Helpers ─────────────────────────────────────────────── */
-function isValidEmail(val) {
+function isValidEmail(val: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 }
 
-function isValidPhone(val) {
+function isValidPhone(val: string) {
   if (!val) return true;
   return /^[\d\s\-().+]{7,}$/.test(val);
 }
@@ -200,7 +200,8 @@ function StarRating({ count = 5 }) {
   );
 }
 
-function AnalyticsCounter({ target, format = "number", duration = 1400 }) {
+function AnalyticsCounter({ target, format = "number", duration = 1400 }: 
+  { target: number; format?: string; duration?: number } ){
   const [count, setCount] = useState(0);
   const started = useRef(false);
   const ref = useRef(null);
@@ -217,8 +218,7 @@ function AnalyticsCounter({ target, format = "number", duration = 1400 }) {
           let step = 0;
           const timer = setInterval(() => {
             step++;
-            const val = Math.round((target * step) / steps);
-            setCount(val);
+            setCount(Math.round((target * step) / steps));
             if (step >= steps) { setCount(target); clearInterval(timer); }
           }, stepTime);
         }
@@ -237,10 +237,10 @@ function AnalyticsCounter({ target, format = "number", duration = 1400 }) {
 }
 
 /* ── Nav ─────────────────────────────────────────────────── */
-function Nav({ current, onNav }) {
+function Nav(
+  { current, onNav }: { onNav: (page: string, id?: string |number) => void; current: string }
+) {
   const [open, setOpen] = useState(false);
-
-  if (current === "wireframes") return null;
 
   return (
     <header className="nav">
@@ -283,7 +283,9 @@ function Nav({ current, onNav }) {
 }
 
 /* ── Home ────────────────────────────────────────────────── */
-function HomePage({ onNav }) {
+function HomePage(
+  { onNav }: { onNav: (page: string, id?: string |number) => void }
+) {
   return (
     <div>
       <section className="hero">
@@ -341,15 +343,29 @@ function HomePage({ onNav }) {
           <div className="card-grid">
             {SERVICES.slice(0, 3).map((svc) => (
               <div key={svc.id} className="svc-card">
-                <div className="svc-icon">{svc.icon}</div>
-                <h3 className="svc-name">{svc.name}</h3>
-                <p className="svc-desc">{svc.desc}</p>
-                <div className="svc-footer">
-                  <div>
-                    <div className="svc-price">{svc.price}</div>
-                    <div className="svc-duration">{svc.duration}</div>
+                <div className="svc-card-top">
+                  <div className="svc-card-icon-wrap">
+                    <div className="svc-card-icon">{svc.icon}</div>
                   </div>
-                  <button className="btn-book" onClick={() => onNav("contact", svc.id)}>Book</button>
+                  <div className="svc-card-pricing">
+                    <div className="svc-card-price">{svc.price}</div>
+                    <div className="svc-card-duration">{svc.duration}</div>
+                  </div>
+                </div>
+                <h3 className="svc-card-name">{svc.name}</h3>
+                <p className="svc-card-desc">{svc.desc}</p>
+                <ul className="svc-card-features">
+                  {svc.features.slice(0, 3).map((f) => (
+                    <li key={f} className="svc-card-feature">
+                      <span className="svc-card-feature-dot" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <div className="svc-card-footer">
+                  <button className="svc-card-book" onClick={() => onNav("contact", svc.id)}>
+                    Book Now <ArrowRight size={13} />
+                  </button>
                 </div>
               </div>
             ))}
@@ -363,9 +379,9 @@ function HomePage({ onNav }) {
           <h2 className="section-title" style={{ marginBottom: "2rem" }}>How It Works</h2>
           <div className="steps-grid">
             {[
-              { step: "01", title: "Book Online",        desc: "Choose your service and fill out a quick form. We confirm within one business day." },
-              { step: "02", title: "Drop Off Your Car",  desc: "Bring your vehicle to our Richmond studio. We do a free walk-around inspection first." },
-              { step: "03", title: "Pick Up Perfected",  desc: "We text you when it's ready. Drive away with a showroom finish, guaranteed." },
+              { step: "01", title: "Book Online",       desc: "Choose your service and fill out a quick form. We confirm within one business day." },
+              { step: "02", title: "Drop Off Your Car", desc: "Bring your vehicle to our Richmond studio. We do a free walk-around inspection first." },
+              { step: "03", title: "Pick Up Perfected", desc: "We text you when it's ready. Drive away with a showroom finish, guaranteed." },
             ].map((item) => (
               <div key={item.step} className="step">
                 <div className="step-num">{item.step}</div>
@@ -377,7 +393,6 @@ function HomePage({ onNav }) {
         </div>
       </section>
 
-      {/* Leave a Review */}
       <div className="review-invite-band">
         <div className="review-invite-inner">
           <div className="review-invite-stars">
@@ -414,7 +429,8 @@ function HomePage({ onNav }) {
 }
 
 /* ── Services ────────────────────────────────────────────── */
-function ServicesPage({ onNav }) {
+function ServicesPage({ onNav }: { onNav: (page: string, id?: string | number) => void }
+) {
   return (
     <div>
       <div className="page-hdr">
@@ -425,7 +441,6 @@ function ServicesPage({ onNav }) {
         </div>
       </div>
 
-      {/* Quick links to gallery and reviews */}
       <div className="svc-quicklinks">
         <div className="wrap">
           <button className="svc-quicklink-btn" onClick={() => onNav("gallery")}>
@@ -467,7 +482,11 @@ function ServicesPage({ onNav }) {
                       </div>
                     </div>
                   </div>
-                  <button className="btn btn-primary btn-full" style={{ flexShrink: 0 }} onClick={() => onNav("contact", svc.id)}>
+                  <button
+                    className="btn btn-primary"
+                    style={{ flexShrink: 0, alignSelf: "flex-start" }}
+                    onClick={() => onNav("contact", svc.id)}
+                  >
                     Book This
                   </button>
                 </div>
@@ -481,9 +500,9 @@ function ServicesPage({ onNav }) {
         <div className="wrap">
           <div className="guarantee-strip">
             {[
-              { icon: <Shield size={20} />,       title: "Satisfaction Guaranteed", desc: "Not satisfied? We redo it free." },
-              { icon: <CheckCircle size={20} />,   title: "Free Inspection",         desc: "Every vehicle gets a walk-around before we start." },
-              { icon: <Clock size={20} />,         title: "On-Time Promise",         desc: "Ready by the quoted time, always." },
+              { icon: <Shield size={20} />,     title: "Satisfaction Guaranteed", desc: "Not satisfied? We redo it free." },
+              { icon: <CheckCircle size={20} />, title: "Free Inspection",         desc: "Every vehicle gets a walk-around before we start." },
+              { icon: <Clock size={20} />,       title: "On-Time Promise",         desc: "Ready by the quoted time, always." },
             ].map((item) => (
               <div key={item.title} className="guarantee-item">
                 <div className="guarantee-icon">{item.icon}</div>
@@ -499,7 +518,8 @@ function ServicesPage({ onNav }) {
 }
 
 /* ── Gallery ─────────────────────────────────────────────── */
-function GalleryPage({ onNav }) {
+function GalleryPage({ onNav }: { onNav: (page: string, id?: string | number) => void }
+) {
   return (
     <div>
       <div className="page-hdr">
@@ -533,10 +553,11 @@ function GalleryPage({ onNav }) {
               </div>
             ))}
           </div>
-
           <div className="gallery-cta">
             <p className="gallery-cta-text">Want results like these?</p>
-            <button className="btn btn-primary" onClick={() => onNav("contact")}>Book a Detail <ArrowRight size={15} /></button>
+            <button className="btn btn-primary" onClick={() => onNav("contact")}>
+              Book a Detail <ArrowRight size={15} />
+            </button>
           </div>
         </div>
       </section>
@@ -560,7 +581,6 @@ function ReviewsPage() {
 
       <section className="section">
         <div className="wrap">
-          {/* Summary bar */}
           <div className="reviews-summary">
             <div className="reviews-overall">
               <div className="reviews-big-num">{avgRating}</div>
@@ -587,7 +607,6 @@ function ReviewsPage() {
             </div>
           </div>
 
-          {/* Review grid */}
           <div className="reviews-grid">
             {REVIEWS.map((r) => (
               <div key={r.id} className="review-card">
@@ -607,7 +626,8 @@ function ReviewsPage() {
 }
 
 /* ── About ───────────────────────────────────────────────── */
-function AboutPage({ onNav }) {
+function AboutPage({ onNav }: { onNav: (page: string, id?: string | number) => void }
+) {
   return (
     <div>
       <div className="about-hero">
@@ -650,9 +670,9 @@ function AboutPage({ onNav }) {
           <h2 className="section-title" style={{ marginBottom: "2rem" }}>Meet the Crew</h2>
           <div className="team-grid">
             {[
-              { name: "Jerrod Evans", role: "Founder & Lead Detailer",      bio: "15 years in the trade. Started with a bucket and a dream — now runs one of Richmond's most trusted detail studios.", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=480&fit=crop&auto=format" },
-              { name: "Priya Shah",   role: "Paint Correction Specialist",   bio: "Certified in Gtechniq and Gyeon coatings. Has corrected over 600 vehicles and counting.",                           img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=480&fit=crop&auto=format" },
-              { name: "Carlos Reyes", role: "Interior & Upholstery Tech",    bio: "Former luxury upholstery specialist. If the interior looks or smells rough, Carlos makes it right.",                  img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=480&fit=crop&auto=format" },
+              { name: "Jerrod Evans", role: "Founder & Lead Detailer",    bio: "15 years in the trade. Started with a bucket and a dream — now runs one of Richmond's most trusted detail studios.", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=480&fit=crop&auto=format" },
+              { name: "Priya Shah",   role: "Paint Correction Specialist", bio: "Certified in Gtechniq and Gyeon coatings. Has corrected over 600 vehicles and counting.",                           img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=480&fit=crop&auto=format" },
+              { name: "Carlos Reyes", role: "Interior & Upholstery Tech",  bio: "Former luxury upholstery specialist. If the interior looks or smells rough, Carlos makes it right.",                  img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=480&fit=crop&auto=format" },
             ].map((m) => (
               <div key={m.name} className="team-member">
                 <div className="team-photo-wrap">
@@ -665,7 +685,6 @@ function AboutPage({ onNav }) {
             ))}
           </div>
 
-          {/* Google Analytics Box */}
           <div className="analytics-box">
             <div className="analytics-header">
               <div className="analytics-title">
@@ -680,10 +699,10 @@ function AboutPage({ onNav }) {
 
             <div className="analytics-metrics">
               {[
-                { target: 24851,  format: "number",  label: "Total Visits",    trend: "+12% this month",   icon: <Eye size={13} /> },
-                { target: 1847,   format: "number",  label: "Monthly Visitors", trend: "+8% vs last month", icon: <Users size={13} /> },
-                { target: 154,    format: "time",    label: "Avg. Session",    trend: "Above industry avg", icon: <Clock size={13} /> },
-                { target: 38,     format: "percent", label: "Bounce Rate",     trend: "−4% vs last month",  icon: <TrendingUp size={13} /> },
+                { target: 24851, format: "number",  label: "Total Visits",     trend: "+12% this month",    icon: <Eye size={13} /> },
+                { target: 1847,  format: "number",  label: "Monthly Visitors", trend: "+8% vs last month",  icon: <Users size={13} /> },
+                { target: 154,   format: "time",    label: "Avg. Session",     trend: "Above industry avg",  icon: <Clock size={13} /> },
+                { target: 38,    format: "percent", label: "Bounce Rate",      trend: "−4% vs last month",   icon: <TrendingUp size={13} /> },
               ].map((m) => (
                 <div key={m.label} className="analytics-metric">
                   <div className="analytics-metric-icon">{m.icon}</div>
@@ -699,13 +718,15 @@ function AboutPage({ onNav }) {
             <div className="analytics-footer">
               <div className="analytics-ga-brand">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <rect x="1" y="11" width="5" height="12" rx="1" fill="#e37400" />
-                  <rect x="9.5" y="6" width="5" height="17" rx="1" fill="#e37400" opacity="0.7" />
-                  <rect x="18" y="1" width="5" height="22" rx="1" fill="#e37400" opacity="0.45" />
+                  <rect x="1"   y="11" width="5" height="12" rx="1" fill="#e37400" />
+                  <rect x="9.5" y="6"  width="5" height="17" rx="1" fill="#e37400" opacity="0.7" />
+                  <rect x="18"  y="1"  width="5" height="22" rx="1" fill="#e37400" opacity="0.45" />
                 </svg>
                 Powered by Google Analytics
               </div>
-              <div className="analytics-updated">Updated {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
+              <div className="analytics-updated">
+                Updated {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              </div>
             </div>
           </div>
         </div>
@@ -722,17 +743,18 @@ function AboutPage({ onNav }) {
 }
 
 /* ── Contact ─────────────────────────────────────────────── */
-function ContactPage({ preselectedService }) {
+function ContactPage({ preselectedService }: { preselectedService?: string | number }
+) {
   const [form, setForm] = useState({
     name: "", email: "", phone: "", vehicle: "",
     service: preselectedService || "",
     message: "",
   });
-  const [errors, setErrors]     = useState({});
+  const [errors, setErrors]       = useState<Record<string, string | undefined>>({});
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  function update(field, val) {
+  function update(field: string, val: string | number) {
     setForm((f) => ({ ...f, [field]: val }));
     if (errors[field]) setErrors((e) => ({ ...e, [field]: undefined }));
   }
@@ -750,7 +772,7 @@ function ContactPage({ preselectedService }) {
     return e;
   }
 
-  function handleSubmit(e) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) {
@@ -762,7 +784,8 @@ function ContactPage({ preselectedService }) {
     setTimeout(() => { setSubmitting(false); setSubmitted(true); }, 1000);
   }
 
-  function FieldError({ msg }) {
+  function FieldError({ msg }: { msg?: string }
+) {
     if (!msg) return null;
     return (
       <div className="field-err" data-err="true">
@@ -879,441 +902,9 @@ function ContactPage({ preselectedService }) {
     </div>
   );
 }
-
-/* ── Wireframes ──────────────────────────────────────────── */
-function WBox({ label, h = null, cx = "", style: s = {} }) {
-  return (
-    <div className={`w-box${cx ? " " + cx : ""}`} style={{ ...(h ? { height: h } : {}), ...s }}>
-      <span>{label}</span>
-    </div>
-  );
-}
-
-function WNote({ children }) {
-  return (
-    <div className="w-note">
-      <span className="w-arr">→</span>
-      <span className="w-note-txt">{children}</span>
-    </div>
-  );
-}
-
-function WZone({ title, note = "", children }) {
-  return (
-    <div className="w-zone">
-      <div className="w-zone-hdr">
-        <span className="w-zone-title">{title}</span>
-        {note && <span className="w-zone-note">{note}</span>}
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function WPageBreak({ num, title, route }) {
-  return (
-    <div className="w-pbreak">
-      <div className="w-pnum">{num}</div>
-      <div className="w-pinfo">
-        <div className="w-ptitle">{title}</div>
-        <div className="w-proute">{route}</div>
-      </div>
-      <div className="w-prule" />
-    </div>
-  );
-}
-
-function SharedWireNav() {
-  return (
-    <WZone title="Nav — fixed top bar" note="Global · all pages">
-      <div className="w-row w-bg" style={{ padding: "0.375rem 0.625rem" }}>
-        <WBox label="EVANS logo" h="1.75rem" style={{ width: "5rem" }} />
-        <div style={{ flex: 1 }} />
-        {["Home","Services","About","Contact"].map(n => <WBox key={n} label={n} h="1.5rem" style={{ width: "3.5rem" }} />)}
-        <WBox label="Book Now" h="2rem" cx="w-box-cta" style={{ width: "5.5rem" }} />
-      </div>
-      <WNote>Fixed · semi-transparent dark bg. Active page link highlighted in red.</WNote>
-      <WNote>Mobile: full nav replaced by Book button + hamburger → full-width dropdown.</WNote>
-    </WZone>
-  );
-}
-
-function SharedWireFooter() {
-  return (
-    <WZone title="Footer — shared across all pages" note="Global">
-      <div className="w-row w-bg" style={{ justifyContent: "space-between", padding: "0.5rem 0.75rem" }}>
-        <WBox label="EVANS logo" h="1.5rem" style={{ width: "5rem" }} />
-        <div className="w-row" style={{ gap: "0.25rem" }}>
-          {["Home","Services","Gallery","Reviews","About","Contact"].map(n => <WBox key={n} label={n} h="1.5rem" style={{ width: "3.5rem" }} />)}
-        </div>
-        <WBox label="© 2025 Evans" h="1.5rem" style={{ width: "5.5rem" }} />
-      </div>
-      <WNote>Logo left · nav center · copyright right. Dark bg, hairline top border.</WNote>
-    </WZone>
-  );
-}
-
-function WireframesPage({ onNav }) {
-  return (
-    <div className="w-doc">
-      <div className="w-hdr">
-        <div>
-          <div className="w-hdr-tag">MVP Wireframe Document</div>
-          <div className="w-hdr-title">Evans Detailing</div>
-          <div className="w-hdr-meta">6-Page Website · MVP Rev 2.0 · {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</div>
-          <div className="w-hdr-actions">
-            <button className="w-btn-back" onClick={() => onNav("home")}>← Back to Site</button>
-            <button className="w-btn-print" onClick={() => window.print()}><Printer size={13} /> Print / PDF</button>
-          </div>
-        </div>
-      </div>
-
-      <div className="w-bar">
-        <div className="w-bar-label">Core MVP User Flow</div>
-        <div className="w-flow">
-          {["Home (hero + services preview)", "→", "Services (full list + Book button)", "→", "Contact (pre-filled service + form)", "→", "Success confirmation"].map((s, i) =>
-            s === "→"
-              ? <span key={i} className="w-flow-arr">→</span>
-              : <span key={i} className="w-flow-step">{s}</span>
-          )}
-        </div>
-      </div>
-
-      <div className="w-legend">
-        {[
-          { cls: "",            label: "UI element / component" },
-          { cls: "w-box-cta",  label: "Primary CTA (filled)" },
-          { cls: "w-box-outline", label: "Secondary CTA (outline)" },
-          { cls: "w-box-err",  label: "Error / validation state" },
-        ].map((item) => (
-          <div key={item.label} className="w-legend-item">
-            <div className={`w-legend-sw w-box ${item.cls}`} style={{ height: "0.875rem", padding: 0 }} />
-            <span className="w-legend-txt">{item.label}</span>
-          </div>
-        ))}
-        <div className="w-legend-item">
-          <div className="w-legend-sw" style={{ border: "1px dashed #d1d5db", height: "0.875rem" }} />
-          <span className="w-legend-txt">Section boundary</span>
-        </div>
-      </div>
-
-      <div className="w-body">
-        {/* ── Page 01 ── */}
-        <WPageBreak num="01" title="Home" route="Route: / · Entry point of the core user flow" />
-        <SharedWireNav />
-
-        <WZone title="Hero — viewport height" note="Section 1">
-          <div className="w-bg" style={{ minHeight: "12rem" }}>
-            <WBox label="Background photo (car detail) · opacity 25%" h="4.5rem" cx="w-w-full" />
-            <div className="w-g2" style={{ marginTop: "0.5rem", gap: "0.5rem" }}>
-              <div className="w-col">
-                <WBox label="Eyebrow: 'Richmond, VA · Pro Detailing'" h="1.125rem" cx="w-w-full" />
-                <WBox label="H1 Display — 2-line headline" h="3.5rem" cx="w-w-full" />
-                <WBox label="Subheadline (1–2 lines)" h="2rem" cx="w-w-full" />
-                <div className="w-row">
-                  <WBox label="Book a Detail → [primary]" h="2.75rem" cx="w-box-cta" style={{ flex: 1 }} />
-                  <WBox label="View Services [outline]" h="2.75rem" cx="w-box-outline" style={{ flex: 1 }} />
-                </div>
-              </div>
-              <WBox label="Photo bleeds right edge" cx="w-hf" />
-            </div>
-          </div>
-          <WNote>Both CTAs min-height 48px (touch target). Primary → Contact, secondary → Services.</WNote>
-        </WZone>
-
-        <WZone title="Stat Strip" note="Section 1b">
-          <div className="w-g4 w-bg" style={{ padding: "0.25rem" }}>
-            {["900+ Cars","6 yrs","4.9★ Rating","Free Inspect"].map(s => <WBox key={s} label={s} h="2.75rem" cx="w-w-full" />)}
-          </div>
-        </WZone>
-
-        <WZone title="Services Preview — 3 cards" note="Section 2">
-          <div className="w-g3">
-            {["Exterior Wash & Wax","Interior Detail","Paint Correction"].map(name => (
-              <div key={name} className="w-col w-bg" style={{ padding: "0.5rem" }}>
-                <WBox label={name} h="1.75rem" cx="w-w-full" />
-                <WBox label="Short desc" h="2.25rem" cx="w-w-full" />
-                <div className="w-row">
-                  <WBox label="Price · Time" h="2rem" style={{ flex: 1 }} />
-                  <WBox label="Book" h="2.25rem" cx="w-box-outline" style={{ width: "3.5rem" }} />
-                </div>
-              </div>
-            ))}
-          </div>
-          <WNote>"Book" → Contact with service pre-selected.</WNote>
-        </WZone>
-
-        <WZone title="Leave a Review Band" note="Section 3">
-          <div className="w-row w-bg" style={{ padding: "0.75rem", justifyContent: "space-between", alignItems: "center" }}>
-            <div className="w-col" style={{ gap: "0.2rem", flex: 1 }}>
-              <WBox label="★★★★★ star row" h="1.125rem" style={{ width: "6rem" }} />
-              <WBox label="'Happy with your detail? Leave a Google review.'" h="1.75rem" cx="w-w-full" />
-            </div>
-            <WBox label="Leave a Google Review ↗ [outline, external link]" h="2.75rem" cx="w-box-outline" style={{ width: "12rem", marginLeft: "0.75rem", flexShrink: 0 }} />
-          </div>
-          <WNote>External link — opens Google Reviews in a new tab. No in-app form.</WNote>
-        </WZone>
-
-        <WZone title="How It Works + CTA Band" note="Section 4–5">
-          <div className="w-g3 w-bg" style={{ padding: "0.5rem", gap: 0 }}>
-            {["01 Book Online","02 Drop Off Car","03 Pick Up Perfected"].map((s, i) => (
-              <div key={s} className={`w-col${i < 2 ? " w-divr" : ""}`} style={{ padding: "0.5rem", gap: "0.375rem" }}>
-                <WBox label={s} h="1.75rem" cx="w-w-full" />
-                <WBox label="Step description" h="2.5rem" cx="w-w-full" />
-              </div>
-            ))}
-          </div>
-          <div className="w-row w-box-cta" style={{ padding: "0.75rem 1rem", marginTop: "0.375rem", justifyContent: "space-between" }}>
-            <WBox label='"Ready to Book?" + subtext' h="2.5rem" style={{ flex: 1 }} />
-            <WBox label="Schedule Now" h="2.75rem" cx="w-box-outline" style={{ width: "8rem", marginLeft: "0.75rem" }} />
-          </div>
-        </WZone>
-        <SharedWireFooter />
-
-        {/* ── Page 02 ── */}
-        <WPageBreak num="02" title="Services" route="Route: /services · Full service list — step 2 of core flow" />
-        <SharedWireNav />
-
-        <WZone title="Page Header" note="Section 1">
-          <div className="w-col w-bg" style={{ padding: "0.75rem", gap: "0.375rem" }}>
-            <WBox label="H1 'Our Services'" h="2.75rem" style={{ width: "14rem" }} />
-            <WBox label="Supporting paragraph" h="1.75rem" style={{ width: "65%" }} />
-          </div>
-        </WZone>
-
-        <WZone title="Quick Links Bar" note="Section 1b">
-          <div className="w-row w-bg" style={{ padding: "0.5rem 0.75rem", gap: "0.5rem" }}>
-            <WBox label="📷 Before & After Gallery →" h="2.75rem" cx="w-box-outline" style={{ flex: 1 }} />
-            <WBox label="divider" h="2.75rem" style={{ width: "1px", background: "#d1d5db" }} />
-            <WBox label="💬 Customer Reviews →" h="2.75rem" cx="w-box-outline" style={{ flex: 1 }} />
-          </div>
-          <WNote>Both links navigate to Gallery and Reviews pages respectively.</WNote>
-        </WZone>
-
-        <WZone title="Service List — stacked rows (5 total)" note="Section 2">
-          {["Exterior Wash & Wax · $120","Interior Detail · $150","Paint Correction · $350","Ceramic Coating · $800","Full Detail Package · $250"].map((name, i) => (
-            <div key={i} className="w-bg" style={{ marginBottom: "0.375rem", padding: "0.5rem" }}>
-              <div className="w-row" style={{ gap: "0.5rem" }}>
-                <div className="w-col" style={{ flex: 1, gap: "0.3rem" }}>
-                  <WBox label={name} h="1.75rem" cx="w-w-full" />
-                  <WBox label="Description + feature tags" h="2.25rem" cx="w-w-full" />
-                </div>
-                <WBox label="Book This" h="2.75rem" cx="w-box-cta" style={{ width: "6rem", flexShrink: 0 }} />
-              </div>
-            </div>
-          ))}
-        </WZone>
-
-        <WZone title="Guarantee Strip" note="Section 3">
-          <div className="w-g3 w-bg" style={{ padding: "0.5rem" }}>
-            {["Satisfaction Guaranteed","Free Inspection","On-Time Promise"].map(t => (
-              <div key={t} className="w-col" style={{ alignItems: "center", gap: "0.25rem", padding: "0.375rem" }}>
-                <WBox label={t} h="1.625rem" cx="w-w-full" />
-              </div>
-            ))}
-          </div>
-        </WZone>
-        <SharedWireFooter />
-
-        {/* ── Page 03 ── */}
-        <WPageBreak num="03" title="Before & After Gallery" route="Route: /gallery · Reachable from Services page quick link" />
-        <SharedWireNav />
-
-        <WZone title="Page Header" note="Section 1">
-          <div className="w-col w-bg" style={{ padding: "0.75rem", gap: "0.375rem" }}>
-            <WBox label="H1 'Before & After'" h="2.75rem" style={{ width: "14rem" }} />
-            <WBox label="Intro paragraph" h="1.625rem" style={{ width: "60%" }} />
-          </div>
-        </WZone>
-
-        <WZone title="Gallery Grid — stacked cards (5 items)" note="Section 2">
-          {["Exterior Wash & Wax","Paint Correction","Interior Detail","Ceramic Coating","Full Detail Package"].map((svc, i) => (
-            <div key={i} className="w-bg" style={{ marginBottom: "0.5rem" }}>
-              <div className="w-g2">
-                <div style={{ position: "relative" }}>
-                  <WBox label="BEFORE — photo" h="5rem" cx="w-w-full" />
-                  <div style={{ position: "absolute", top: "0.25rem", left: "0.25rem", background: "rgba(0,0,0,0.7)", padding: "0.1rem 0.3rem" }}>
-                    <span style={{ color: "#fff", fontSize: "0.5rem", fontWeight: 700 }}>BEFORE</span>
-                  </div>
-                </div>
-                <div style={{ position: "relative" }}>
-                  <WBox label="AFTER — photo" h="5rem" cx="w-w-full" style={{ borderColor: "#c8102e" }} />
-                  <div style={{ position: "absolute", top: "0.25rem", left: "0.25rem", background: "#c8102e", padding: "0.1rem 0.3rem" }}>
-                    <span style={{ color: "#fff", fontSize: "0.5rem", fontWeight: 700 }}>AFTER</span>
-                  </div>
-                </div>
-              </div>
-              <div style={{ padding: "0.375rem 0.5rem", borderTop: "1px solid #e5e7eb" }}>
-                <WBox label={`${svc} · Vehicle name · Caption`} h="1.625rem" cx="w-w-full" />
-              </div>
-            </div>
-          ))}
-          <WNote>Side-by-side on desktop. Stacked (before top, after bottom) on mobile.</WNote>
-          <WNote>BEFORE label = dark pill. AFTER label = red pill.</WNote>
-        </WZone>
-
-        <WZone title="Book CTA" note="Section 3">
-          <div className="w-row w-bg" style={{ padding: "0.75rem", justifyContent: "center", gap: "0.75rem" }}>
-            <WBox label='"Want results like these?" text' h="1.5rem" style={{ width: "10rem" }} />
-            <WBox label="Book a Detail → [primary]" h="2.75rem" cx="w-box-cta" style={{ width: "8rem" }} />
-          </div>
-        </WZone>
-        <SharedWireFooter />
-
-        {/* ── Page 04 ── */}
-        <WPageBreak num="04" title="Customer Reviews" route="Route: /reviews · Reachable from Services page quick link" />
-        <SharedWireNav />
-
-        <WZone title="Page Header" note="Section 1">
-          <div className="w-col w-bg" style={{ padding: "0.75rem", gap: "0.375rem" }}>
-            <WBox label="H1 'Customer Reviews'" h="2.75rem" style={{ width: "14rem" }} />
-            <WBox label="Intro paragraph" h="1.625rem" style={{ width: "60%" }} />
-          </div>
-        </WZone>
-
-        <WZone title="Rating Summary + Leave Review" note="Section 2">
-          <div className="w-row w-bg" style={{ padding: "0.75rem", gap: "0.75rem" }}>
-            <div className="w-col" style={{ alignItems: "center", gap: "0.25rem", flexShrink: 0 }}>
-              <WBox label="4.9" h="3rem" style={{ width: "3.5rem", fontSize: "0.9rem" }} />
-              <WBox label="★★★★★" h="1.125rem" style={{ width: "5rem" }} />
-              <WBox label="8 Google Reviews" h="1rem" style={{ width: "5rem" }} />
-            </div>
-            <div style={{ width: "1px", background: "#e5e7eb", flexShrink: 0 }} />
-            <div className="w-col" style={{ flex: 1, gap: "0.3rem" }}>
-              <WBox label="Summary text — overall rating context" h="2.5rem" cx="w-w-full" />
-              <WBox label="Leave Your Own Review ↗ [outline, external]" h="2.75rem" cx="w-box-outline" style={{ width: "12rem" }} />
-            </div>
-          </div>
-        </WZone>
-
-        <WZone title="Review Grid — 2-col cards (8 reviews)" note="Section 3">
-          <div className="w-g2" style={{ gap: "0.375rem" }}>
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="w-col w-bg" style={{ padding: "0.5rem", gap: "0.25rem" }}>
-                <WBox label="★★★★★" h="1rem" style={{ width: "4rem" }} />
-                <WBox label="Review text (italic quote, 3–4 lines)" h="3.5rem" cx="w-w-full" />
-                <WBox label="Name · Vehicle · Service · Date" h="1.625rem" cx="w-w-full" />
-              </div>
-            ))}
-          </div>
-          <WNote>1-col on mobile, 2-col on tablet+.</WNote>
-        </WZone>
-        <SharedWireFooter />
-
-        {/* ── Page 05 ── */}
-        <WPageBreak num="05" title="About Us" route="Route: /about · Brand story + team + analytics box" />
-        <SharedWireNav />
-
-        <WZone title="Story + Stats Bar + Team" note="Sections 1–3">
-          <div className="w-g2 w-bg" style={{ padding: "0.625rem" }}>
-            <div className="w-col" style={{ gap: "0.375rem" }}>
-              <WBox label="H1 'About Evans' + story paragraphs" h="6rem" cx="w-w-full" />
-            </div>
-            <WBox label="Studio photo" cx="w-hf" />
-          </div>
-          <div className="w-g4" style={{ gap: 0, background: "#e5e7eb", marginTop: "0.375rem" }}>
-            {["2018 Founded","900+ Detailed","3 Techs","4.9★ Rating"].map(s => (
-              <div key={s} className="w-col" style={{ padding: "0.5rem", textAlign: "center" }}>
-                <WBox label={s} h="2.5rem" cx="w-w-full" />
-              </div>
-            ))}
-          </div>
-          <div className="w-g3" style={{ gap: "0.75rem", marginTop: "0.5rem" }}>
-            {["Marcus Evans","Priya Shah","Carlos Reyes"].map(m => (
-              <div key={m} className="w-col" style={{ gap: "0.3rem" }}>
-                <WBox label={`${m} — portrait`} h="5rem" cx="w-w-full" />
-                <WBox label="Role + bio" h="2.5rem" cx="w-w-full" />
-              </div>
-            ))}
-          </div>
-        </WZone>
-
-        <WZone title="Google Analytics Box" note="Section 4 — inside team section">
-          <div className="w-col w-bg" style={{ padding: "0.5rem", gap: "0.25rem" }}>
-            <div className="w-row" style={{ justifyContent: "space-between" }}>
-              <WBox label="📊 Site Analytics (heading)" h="1.5rem" style={{ width: "8rem" }} />
-              <WBox label="● Live · Google Analytics" h="1.25rem" style={{ width: "8rem" }} />
-            </div>
-            <div className="w-g2" style={{ gap: "1px" }}>
-              {["24,851 Total Visits","1,847 Monthly Visitors","2m 34s Avg. Session","38% Bounce Rate"].map((m, i) => (
-                <div key={i} className="w-col w-box" style={{ padding: "0.5rem", background: "#fff", gap: "0.15rem" }}>
-                  <WBox label={m.split(" ")[0]} h="2rem" style={{ width: "60%" }} />
-                  <WBox label={m.replace(/^\S+ /,"")} h="0.875rem" cx="w-w-full" />
-                  <WBox label="+trend indicator (green)" h="0.75rem" cx="w-w-full" />
-                </div>
-              ))}
-            </div>
-            <div className="w-row" style={{ justifyContent: "space-between" }}>
-              <WBox label="Powered by Google Analytics (GA logo)" h="1.25rem" style={{ width: "10rem" }} />
-              <WBox label="Updated [date]" h="1.25rem" style={{ width: "6rem" }} />
-            </div>
-          </div>
-          <WNote>Numbers animate (count up) on scroll-into-view using IntersectionObserver.</WNote>
-          <WNote>Green pulsing dot = live indicator. GA bar-chart icon in footer.</WNote>
-        </WZone>
-        <SharedWireFooter />
-
-        {/* ── Page 06 ── */}
-        <WPageBreak num="06" title="Contact Us" route="Route: /contact · Booking form — end of core user flow" />
-        <SharedWireNav />
-
-        <WZone title="Page Header + 2-col Form Layout" note="Sections 1–2">
-          <div className="w-col w-bg" style={{ padding: "0.75rem", gap: "0.375rem", marginBottom: "0.375rem" }}>
-            <WBox label="H1 'Contact Us' + paragraph" h="3.25rem" cx="w-w-full" />
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 3fr", gap: "0.75rem" }}>
-            <div className="w-col" style={{ gap: "0.5rem" }}>
-              <WBox label="Studio Info (location, phone, email, hours)" h="8rem" cx="w-w-full" />
-              <WBox label="'Good to Know' box" h="3.5rem" cx="w-w-full" />
-            </div>
-            <div className="w-col" style={{ gap: "0.5rem" }}>
-              <div className="w-g2">
-                <WBox label="Full Name *" h="2.75rem" cx="w-w-full" />
-                <WBox label="Email *" h="2.75rem" cx="w-w-full" />
-              </div>
-              <div className="w-g2">
-                <WBox label="Phone (optional)" h="2.75rem" cx="w-w-full" />
-                <WBox label="Vehicle *" h="2.75rem" cx="w-w-full" />
-              </div>
-              <WBox label="Service dropdown (pre-fills from Services page)" h="2.75rem" cx="w-w-full" />
-              <WBox label="Message * (textarea — 5 rows)" h="5.5rem" cx="w-w-full" />
-              <WBox label="Validation error states (inline + summary banner)" h="2.25rem" cx="w-box-err w-w-full" />
-              <WBox label="Send Booking Request [submit · spinner]" h="3rem" cx="w-box-cta w-w-full" />
-            </div>
-          </div>
-          <WNote>Service dropdown pre-fills if arriving via 'Book'/'Book This'. State via navigate().</WNote>
-          <WNote>Success state replaces entire form on submit.</WNote>
-        </WZone>
-        <SharedWireFooter />
-
-        {/* Spec notes */}
-        <div className="w-spec">
-          <div className="w-spec-title">MVP Specification Notes</div>
-          <div className="w-spec-grid">
-            {[
-              ["Pages (6 total)",     "Home, Services, Gallery, Reviews, About, Contact. Gallery + Reviews reachable from Services quick-links, footer, and mobile nav dropdown."],
-              ["Core User Flow",      "Home → Services (optional) → Contact (pre-selected service) → Success. Every CTA routes correctly end-to-end."],
-              ["Gallery",             "5 before/after photo pairs. Side-by-side on desktop, stacked on mobile. Service tag + vehicle + caption per entry. Bottom CTA to Contact."],
-              ["Reviews",             "8 customer reviews with star ratings, name, vehicle, service, date. Summary bar with avg rating + Google Reviews external link. Leave Review link opens Google in new tab."],
-              ["Leave a Review",      "Home page band links to Google Reviews (external, new tab). Reviews page summary also links to Google Reviews."],
-              ["Analytics Box",       "About page panel shows 4 metrics: Total Visits, Monthly Visitors, Avg Session, Bounce Rate. Numbers animate on scroll-into-view. Styled with Google Analytics branding."],
-              ["Form Validation",     "Client-side. Required: Name, Email, Vehicle, Message. Phone optional but validated if provided. Inline errors per field. Summary banner for multiple failures."],
-              ["Mobile Strategy",     "Min tap target 48px. Nav → hamburger with Gallery + Reviews links. Gallery pair stacks vertically. Reviews grid goes 1-col."],
-            ].map(([k, v]) => (
-              <div key={k}>
-                <div className="w-spec-k">{k}</div>
-                <div className="w-spec-v">{v}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ── Footer ──────────────────────────────────────────────── */
-function Footer({ onNav }) {
+function Footer({ onNav }: { onNav: (page: string, id?: string | number) => void }
+) {
   return (
     <footer className="footer">
       <div className="footer-inner">
@@ -1336,17 +927,14 @@ function Footer({ onNav }) {
 
 /* ── App Root ─────────────────────────────────────────────── */
 export default function App() {
-  const [page, setPage]                       = useState("home");
-  const [preselectedService, setPreselected]  = useState(undefined);
+  const [page, setPage]                      = useState("home");
+  const [preselectedService, setPreselected] = useState<string | number | undefined>(undefined);
 
-  function navigate(p, service = undefined) {
-    setPreselected(service);
-    setPage(p);
+  function navigate(page: string, id?: string | number) {
+    setPreselected(id);
+    setPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
-
-  if (page === "wireframes") return <WireframesPage onNav={navigate} />;
-
   return (
     <div className="site">
       <Nav current={page} onNav={navigate} />

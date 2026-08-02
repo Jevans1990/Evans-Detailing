@@ -9,3 +9,6 @@
 
   Run `npm run dev` to start the development server.
   
+  or
+
+  Open Evans-Detailing file in file explorer, navigate to and open start-website.bat, CTRL click the blue link. 

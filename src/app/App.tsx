@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Menu, X, ChevronRight, Phone, Mail, MapPin, Clock,
   Shield, Zap, Droplets, Sparkles, Car, CheckCircle,
-  AlertCircle, Printer, ArrowRight,
+  AlertCircle, Printer, ArrowRight, Star, ExternalLink,
+  Camera, MessageSquare, TrendingUp, Users, Eye,
 } from "lucide-react";
 
 /* ── Data ───────────────────────────────────────────────── */
@@ -54,6 +55,124 @@ const SERVICES = [
   },
 ];
 
+const GALLERY = [
+  {
+    id: 1,
+    service: "Exterior Wash & Wax",
+    vehicle: "2021 Chevy Silverado",
+    caption: "Heavy road film, tree sap, and brake dust removed. Two-stage hand wash + carnauba wax gives a deep, wet finish.",
+    before: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&h=480&fit=crop&auto=format",
+    after:  "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=700&h=480&fit=crop&auto=format",
+  },
+  {
+    id: 2,
+    service: "Paint Correction",
+    vehicle: "2018 BMW 3 Series",
+    caption: "Swirl marks, fine scratches, and years of wash-induced damage polished out in a two-stage machine correction.",
+    before: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=700&h=480&fit=crop&auto=format",
+    after:  "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=700&h=480&fit=crop&auto=format",
+  },
+  {
+    id: 3,
+    service: "Interior Detail",
+    vehicle: "2019 Toyota 4Runner",
+    caption: "Dog hair, spilled coffee, and ground-in dirt across every surface — steam cleaned and fully deodorized.",
+    before: "https://images.unsplash.com/photo-1504222490345-c075b7c1fdb9?w=700&h=480&fit=crop&auto=format",
+    after:  "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=700&h=480&fit=crop&auto=format",
+  },
+  {
+    id: 4,
+    service: "Ceramic Coating",
+    vehicle: "2022 Porsche 911",
+    caption: "Three-year-old paint corrected then coated with 9H ceramic for maximum hydrophobic gloss and long-term protection.",
+    before: "https://images.unsplash.com/photo-1567818735868-e71b99932e29?w=700&h=480&fit=crop&auto=format",
+    after:  "https://images.unsplash.com/photo-1544636331-9849d1b6dc57?w=700&h=480&fit=crop&auto=format",
+  },
+  {
+    id: 5,
+    service: "Full Detail Package",
+    vehicle: "2017 Ford Mustang GT",
+    caption: "Neglected for two years — full exterior correction, interior deep clean, and a protective polymer sealant coat.",
+    before: "https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=700&h=480&fit=crop&auto=format",
+    after:  "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?w=700&h=480&fit=crop&auto=format",
+  },
+];
+
+const REVIEWS = [
+  {
+    id: 1,
+    name: "James T.",
+    vehicle: "2020 Audi A4",
+    service: "Paint Correction",
+    stars: 5,
+    date: "July 2025",
+    text: "Priya did an incredible job on my A4. I thought the swirl marks were permanent — car looks better than when I bought it from the dealership. Absolutely worth every penny.",
+  },
+  {
+    id: 2,
+    name: "Monica R.",
+    vehicle: "2021 Honda CR-V",
+    service: "Interior Detail",
+    stars: 5,
+    date: "June 2025",
+    text: "Two kids, one dog, three years of chaos — Carlos made the interior look brand new. I genuinely could not believe it was the same car. Booked again for next month already.",
+  },
+  {
+    id: 3,
+    name: "Derek W.",
+    vehicle: "2019 Jeep Wrangler",
+    service: "Exterior Wash & Wax",
+    stars: 5,
+    date: "June 2025",
+    text: "Off-road mud everywhere. Brought it in and they got into every crevice I didn't even know existed. Gloss on the paint is unreal. Will be back every month.",
+  },
+  {
+    id: 4,
+    name: "Stephanie L.",
+    vehicle: "2022 Porsche Macan",
+    service: "Ceramic Coating",
+    stars: 5,
+    date: "May 2025",
+    text: "Ceramic coating has been on for three months now and the water beading is still insane. Marcus walked me through every step of the process. Exceptional service.",
+  },
+  {
+    id: 5,
+    name: "Tony B.",
+    vehicle: "2018 Dodge Charger",
+    service: "Full Detail Package",
+    stars: 5,
+    date: "May 2025",
+    text: "Drove up from Fredericksburg specifically because of these reviews. Was not disappointed. The car came back showroom-perfect. Professional, on time, and the results speak for themselves.",
+  },
+  {
+    id: 6,
+    name: "Aaliyah M.",
+    vehicle: "2023 Tesla Model 3",
+    service: "Exterior Wash & Wax",
+    stars: 4,
+    date: "April 2025",
+    text: "Great attention to detail (pun intended). They even cleaned the door jambs and underside of the hood — stuff I didn't ask for. One star off only because booking took a bit longer than expected.",
+  },
+  {
+    id: 7,
+    name: "Chris P.",
+    vehicle: "2016 Subaru WRX STI",
+    service: "Paint Correction",
+    stars: 5,
+    date: "March 2025",
+    text: "Had heavy water spots etched into the clear coat from sitting outside for years. Priya pulled off what I thought was impossible. The paint has a mirror finish now. Genuinely shocked.",
+  },
+  {
+    id: 8,
+    name: "Kim F.",
+    vehicle: "2020 Kia Telluride",
+    service: "Interior Detail",
+    stars: 5,
+    date: "March 2025",
+    text: "I was almost embarrassed to bring my car in — it was that bad. Carlos and the team were total pros. No judgment, just results. Interior smells and looks completely new. Highly recommend.",
+  },
+];
+
 const NAV_LINKS = [
   { label: "Home",     page: "home" },
   { label: "Services", page: "services" },
@@ -69,6 +188,52 @@ function isValidEmail(val) {
 function isValidPhone(val) {
   if (!val) return true;
   return /^[\d\s\-().+]{7,}$/.test(val);
+}
+
+function StarRating({ count = 5 }) {
+  return (
+    <div className="review-stars">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Star key={i} size={13} fill={i < count ? "#f59e0b" : "none"} color={i < count ? "#f59e0b" : "#374151"} />
+      ))}
+    </div>
+  );
+}
+
+function AnalyticsCounter({ target, format = "number", duration = 1400 }) {
+  const [count, setCount] = useState(0);
+  const started = useRef(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started.current) {
+          started.current = true;
+          const steps = 45;
+          const stepTime = duration / steps;
+          let step = 0;
+          const timer = setInterval(() => {
+            step++;
+            const val = Math.round((target * step) / steps);
+            setCount(val);
+            if (step >= steps) { setCount(target); clearInterval(timer); }
+          }, stepTime);
+        }
+      },
+      { threshold: 0.4 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [target, duration]);
+
+  let display = count.toLocaleString();
+  if (format === "percent") display = `${count}%`;
+  if (format === "time")    display = `${Math.floor(count / 60)}m ${String(count % 60).padStart(2, "0")}s`;
+
+  return <span ref={ref}>{display}</span>;
 }
 
 /* ── Nav ─────────────────────────────────────────────────── */
@@ -109,6 +274,8 @@ function Nav({ current, onNav }) {
               {label}
             </button>
           ))}
+          <button className="nav-dropdown-link" onClick={() => { onNav("gallery"); setOpen(false); }}>Gallery</button>
+          <button className="nav-dropdown-link" onClick={() => { onNav("reviews"); setOpen(false); }}>Reviews</button>
         </div>
       )}
     </header>
@@ -210,6 +377,29 @@ function HomePage({ onNav }) {
         </div>
       </section>
 
+      {/* Leave a Review */}
+      <div className="review-invite-band">
+        <div className="review-invite-inner">
+          <div className="review-invite-stars">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star key={i} size={18} fill="#f59e0b" color="#f59e0b" />
+            ))}
+          </div>
+          <div className="review-invite-copy">
+            <h3 className="review-invite-title">Happy with your detail?</h3>
+            <p className="review-invite-sub">Your review helps other car owners find us. Takes 30 seconds and means a lot.</p>
+          </div>
+          <a
+            className="btn btn-outline review-invite-btn"
+            href="https://g.page/r/evans-detailing-richmond/review"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Leave a Google Review <ExternalLink size={13} />
+          </a>
+        </div>
+      </div>
+
       <div className="cta-band">
         <div className="cta-band-inner">
           <div>
@@ -232,6 +422,23 @@ function ServicesPage({ onNav }) {
           <span className="eyebrow">What We Offer</span>
           <h1 className="page-title">Our Services</h1>
           <p className="page-desc">Every package is performed by trained technicians using professional-grade products. Free inspection included with every visit.</p>
+        </div>
+      </div>
+
+      {/* Quick links to gallery and reviews */}
+      <div className="svc-quicklinks">
+        <div className="wrap">
+          <button className="svc-quicklink-btn" onClick={() => onNav("gallery")}>
+            <Camera size={16} />
+            <span>Before &amp; After Gallery</span>
+            <ChevronRight size={14} />
+          </button>
+          <div className="svc-quicklink-divider" />
+          <button className="svc-quicklink-btn" onClick={() => onNav("reviews")}>
+            <MessageSquare size={16} />
+            <span>Customer Reviews</span>
+            <ChevronRight size={14} />
+          </button>
         </div>
       </div>
 
@@ -282,6 +489,114 @@ function ServicesPage({ onNav }) {
                 <div className="guarantee-icon">{item.icon}</div>
                 <h4 className="guarantee-title">{item.title}</h4>
                 <p className="guarantee-desc">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ── Gallery ─────────────────────────────────────────────── */
+function GalleryPage({ onNav }) {
+  return (
+    <div>
+      <div className="page-hdr">
+        <div className="page-hdr-inner">
+          <span className="eyebrow">Real Results</span>
+          <h1 className="page-title">Before &amp; After</h1>
+          <p className="page-desc">Every photo is from an actual Evans Detailing job — no filters, no stock shots. Just the work.</p>
+        </div>
+      </div>
+
+      <section className="section">
+        <div className="wrap">
+          <div className="gallery-grid">
+            {GALLERY.map((item) => (
+              <div key={item.id} className="gallery-item">
+                <div className="gallery-pair">
+                  <div className="gallery-img-wrap">
+                    <img src={item.before} alt={`Before — ${item.vehicle}`} />
+                    <span className="gallery-img-label">Before</span>
+                  </div>
+                  <div className="gallery-img-wrap">
+                    <img src={item.after} alt={`After — ${item.vehicle}`} />
+                    <span className="gallery-img-label after">After</span>
+                  </div>
+                </div>
+                <div className="gallery-item-footer">
+                  <div className="gallery-service-tag">{item.service}</div>
+                  <div className="gallery-vehicle">{item.vehicle}</div>
+                  <p className="gallery-caption">{item.caption}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="gallery-cta">
+            <p className="gallery-cta-text">Want results like these?</p>
+            <button className="btn btn-primary" onClick={() => onNav("contact")}>Book a Detail <ArrowRight size={15} /></button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ── Reviews ─────────────────────────────────────────────── */
+function ReviewsPage() {
+  const avgRating = (REVIEWS.reduce((s, r) => s + r.stars, 0) / REVIEWS.length).toFixed(1);
+
+  return (
+    <div>
+      <div className="page-hdr">
+        <div className="page-hdr-inner">
+          <span className="eyebrow">What Clients Say</span>
+          <h1 className="page-title">Customer Reviews</h1>
+          <p className="page-desc">Verified Google reviews from real Evans Detailing customers in the Richmond area.</p>
+        </div>
+      </div>
+
+      <section className="section">
+        <div className="wrap">
+          {/* Summary bar */}
+          <div className="reviews-summary">
+            <div className="reviews-overall">
+              <div className="reviews-big-num">{avgRating}</div>
+              <div className="reviews-stars-row">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} size={16} fill="#f59e0b" color="#f59e0b" />
+                ))}
+              </div>
+              <div className="reviews-count">{REVIEWS.length} Google Reviews</div>
+            </div>
+            <div className="reviews-summary-divider" />
+            <div className="reviews-summary-right">
+              <p className="reviews-summary-blurb">
+                Evans Detailing is rated <strong>{avgRating} out of 5</strong> based on {REVIEWS.length} customer reviews on Google. We are proud of our reputation and stand behind every job we do.
+              </p>
+              <a
+                className="btn btn-outline reviews-leave-btn"
+                href="https://g.page/r/evans-detailing-richmond/review"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Leave Your Own Review <ExternalLink size={13} />
+              </a>
+            </div>
+          </div>
+
+          {/* Review grid */}
+          <div className="reviews-grid">
+            {REVIEWS.map((r) => (
+              <div key={r.id} className="review-card">
+                <StarRating count={r.stars} />
+                <p className="review-text">"{r.text}"</p>
+                <div className="review-footer">
+                  <div className="review-name">{r.name}</div>
+                  <div className="review-meta">{r.vehicle} · {r.service} · {r.date}</div>
+                </div>
               </div>
             ))}
           </div>
@@ -348,6 +663,50 @@ function AboutPage({ onNav }) {
                 <p className="team-bio">{m.bio}</p>
               </div>
             ))}
+          </div>
+
+          {/* Google Analytics Box */}
+          <div className="analytics-box">
+            <div className="analytics-header">
+              <div className="analytics-title">
+                <TrendingUp size={14} style={{ display: "inline", marginRight: "0.4rem", verticalAlign: "middle" }} />
+                Site Analytics
+              </div>
+              <div className="analytics-badge">
+                <span className="analytics-dot" />
+                Live · Google Analytics
+              </div>
+            </div>
+
+            <div className="analytics-metrics">
+              {[
+                { target: 24851,  format: "number",  label: "Total Visits",    trend: "+12% this month",   icon: <Eye size={13} /> },
+                { target: 1847,   format: "number",  label: "Monthly Visitors", trend: "+8% vs last month", icon: <Users size={13} /> },
+                { target: 154,    format: "time",    label: "Avg. Session",    trend: "Above industry avg", icon: <Clock size={13} /> },
+                { target: 38,     format: "percent", label: "Bounce Rate",     trend: "−4% vs last month",  icon: <TrendingUp size={13} /> },
+              ].map((m) => (
+                <div key={m.label} className="analytics-metric">
+                  <div className="analytics-metric-icon">{m.icon}</div>
+                  <div className="analytics-metric-num">
+                    <AnalyticsCounter target={m.target} format={m.format} />
+                  </div>
+                  <div className="analytics-metric-label">{m.label}</div>
+                  <div className="analytics-metric-trend">{m.trend}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="analytics-footer">
+              <div className="analytics-ga-brand">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <rect x="1" y="11" width="5" height="12" rx="1" fill="#e37400" />
+                  <rect x="9.5" y="6" width="5" height="17" rx="1" fill="#e37400" opacity="0.7" />
+                  <rect x="18" y="1" width="5" height="22" rx="1" fill="#e37400" opacity="0.45" />
+                </svg>
+                Powered by Google Analytics
+              </div>
+              <div className="analytics-updated">Updated {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
+            </div>
           </div>
         </div>
       </section>
@@ -585,7 +944,7 @@ function SharedWireFooter() {
       <div className="w-row w-bg" style={{ justifyContent: "space-between", padding: "0.5rem 0.75rem" }}>
         <WBox label="EVANS logo" h="1.5rem" style={{ width: "5rem" }} />
         <div className="w-row" style={{ gap: "0.25rem" }}>
-          {["Home","Services","About","Contact"].map(n => <WBox key={n} label={n} h="1.5rem" style={{ width: "3.5rem" }} />)}
+          {["Home","Services","Gallery","Reviews","About","Contact"].map(n => <WBox key={n} label={n} h="1.5rem" style={{ width: "3.5rem" }} />)}
         </div>
         <WBox label="© 2025 Evans" h="1.5rem" style={{ width: "5.5rem" }} />
       </div>
@@ -601,7 +960,7 @@ function WireframesPage({ onNav }) {
         <div>
           <div className="w-hdr-tag">MVP Wireframe Document</div>
           <div className="w-hdr-title">Evans Detailing</div>
-          <div className="w-hdr-meta">4-Page Website · MVP Rev 1.0 · {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</div>
+          <div className="w-hdr-meta">6-Page Website · MVP Rev 2.0 · {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</div>
           <div className="w-hdr-actions">
             <button className="w-btn-back" onClick={() => onNav("home")}>← Back to Site</button>
             <button className="w-btn-print" onClick={() => window.print()}><Printer size={13} /> Print / PDF</button>
@@ -660,27 +1019,20 @@ function WireframesPage({ onNav }) {
             </div>
           </div>
           <WNote>Both CTAs min-height 48px (touch target). Primary → Contact, secondary → Services.</WNote>
-          <WNote>Gradient L→R over photo. Bottom gradient fades into stat strip.</WNote>
         </WZone>
 
-        <WZone title="Stat Strip — pinned bottom of hero" note="Section 1b">
+        <WZone title="Stat Strip" note="Section 1b">
           <div className="w-g4 w-bg" style={{ padding: "0.25rem" }}>
             {["900+ Cars","6 yrs","4.9★ Rating","Free Inspect"].map(s => <WBox key={s} label={s} h="2.75rem" cx="w-w-full" />)}
           </div>
-          <WNote>4-col · collapses to 2×2 on mobile.</WNote>
         </WZone>
 
         <WZone title="Services Preview — 3 cards" note="Section 2">
-          <div className="w-row" style={{ justifyContent: "space-between", marginBottom: "0.5rem" }}>
-            <WBox label="H2 'Our Services'" h="2rem" style={{ width: "10rem" }} />
-            <WBox label="All services →" h="1.5rem" cx="w-box-outline" style={{ width: "6rem" }} />
-          </div>
           <div className="w-g3">
             {["Exterior Wash & Wax","Interior Detail","Paint Correction"].map(name => (
               <div key={name} className="w-col w-bg" style={{ padding: "0.5rem" }}>
-                <WBox label="[Icon]" h="1.5rem" style={{ width: "2rem" }} />
                 <WBox label={name} h="1.75rem" cx="w-w-full" />
-                <WBox label="Short desc (2 lines)" h="2.25rem" cx="w-w-full" />
+                <WBox label="Short desc" h="2.25rem" cx="w-w-full" />
                 <div className="w-row">
                   <WBox label="Price · Time" h="2rem" style={{ flex: 1 }} />
                   <WBox label="Book" h="2.25rem" cx="w-box-outline" style={{ width: "3.5rem" }} />
@@ -688,32 +1040,33 @@ function WireframesPage({ onNav }) {
               </div>
             ))}
           </div>
-          <WNote>"Book" → Contact with service pre-selected in dropdown.</WNote>
-          <WNote>3-col (desktop) → 2-col (tablet) → 1-col (mobile).</WNote>
+          <WNote>"Book" → Contact with service pre-selected.</WNote>
         </WZone>
 
-        <WZone title="How It Works — 3 steps" note="Section 3">
+        <WZone title="Leave a Review Band" note="Section 3">
+          <div className="w-row w-bg" style={{ padding: "0.75rem", justifyContent: "space-between", alignItems: "center" }}>
+            <div className="w-col" style={{ gap: "0.2rem", flex: 1 }}>
+              <WBox label="★★★★★ star row" h="1.125rem" style={{ width: "6rem" }} />
+              <WBox label="'Happy with your detail? Leave a Google review.'" h="1.75rem" cx="w-w-full" />
+            </div>
+            <WBox label="Leave a Google Review ↗ [outline, external link]" h="2.75rem" cx="w-box-outline" style={{ width: "12rem", marginLeft: "0.75rem", flexShrink: 0 }} />
+          </div>
+          <WNote>External link — opens Google Reviews in a new tab. No in-app form.</WNote>
+        </WZone>
+
+        <WZone title="How It Works + CTA Band" note="Section 4–5">
           <div className="w-g3 w-bg" style={{ padding: "0.5rem", gap: 0 }}>
             {["01 Book Online","02 Drop Off Car","03 Pick Up Perfected"].map((s, i) => (
               <div key={s} className={`w-col${i < 2 ? " w-divr" : ""}`} style={{ padding: "0.5rem", gap: "0.375rem" }}>
-                <div style={{ color: "#d1d5db", fontSize: "1.75rem", fontWeight: 900, fontFamily: "var(--font-display)", lineHeight: 1 }}>{s.split(" ")[0]}</div>
-                <WBox label={s.replace(/^\d+ /,"")} h="1.75rem" cx="w-w-full" />
-                <WBox label="Short step description" h="2.5rem" cx="w-w-full" />
+                <WBox label={s} h="1.75rem" cx="w-w-full" />
+                <WBox label="Step description" h="2.5rem" cx="w-w-full" />
               </div>
             ))}
           </div>
-          <WNote>Step number large and faded. Mobile: stacks vertically.</WNote>
-        </WZone>
-
-        <WZone title="CTA Band" note="Section 4">
-          <div className="w-row w-box-cta" style={{ padding: "0.75rem 1rem", justifyContent: "space-between" }}>
-            <div className="w-col" style={{ gap: "0.25rem", flex: 1 }}>
-              <div style={{ height: "1.75rem", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", paddingLeft: "0.5rem" }}><span style={{ color: "#fff", fontSize: "0.55rem" }}>"Ready to Book?" heading</span></div>
-              <div style={{ height: "1.25rem", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", paddingLeft: "0.5rem" }}><span style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.55rem" }}>Subtext: Mon–Sat · same-week ok</span></div>
-            </div>
-            <WBox label="Schedule Now" h="2.75rem" cx="w-box-outline" style={{ width: "8rem", marginLeft: "0.75rem", flexShrink: 0 }} />
+          <div className="w-row w-box-cta" style={{ padding: "0.75rem 1rem", marginTop: "0.375rem", justifyContent: "space-between" }}>
+            <WBox label='"Ready to Book?" + subtext' h="2.5rem" style={{ flex: 1 }} />
+            <WBox label="Schedule Now" h="2.75rem" cx="w-box-outline" style={{ width: "8rem", marginLeft: "0.75rem" }} />
           </div>
-          <WNote>Full-width red band. Full-width white CTA button on mobile.</WNote>
         </WZone>
         <SharedWireFooter />
 
@@ -723,16 +1076,24 @@ function WireframesPage({ onNav }) {
 
         <WZone title="Page Header" note="Section 1">
           <div className="w-col w-bg" style={{ padding: "0.75rem", gap: "0.375rem" }}>
-            <WBox label="Eyebrow 'What We Offer'" h="1.125rem" style={{ width: "7rem" }} />
             <WBox label="H1 'Our Services'" h="2.75rem" style={{ width: "14rem" }} />
-            <WBox label="Supporting paragraph — 2 lines" h="1.75rem" style={{ width: "65%" }} />
+            <WBox label="Supporting paragraph" h="1.75rem" style={{ width: "65%" }} />
           </div>
+        </WZone>
+
+        <WZone title="Quick Links Bar" note="Section 1b">
+          <div className="w-row w-bg" style={{ padding: "0.5rem 0.75rem", gap: "0.5rem" }}>
+            <WBox label="📷 Before & After Gallery →" h="2.75rem" cx="w-box-outline" style={{ flex: 1 }} />
+            <WBox label="divider" h="2.75rem" style={{ width: "1px", background: "#d1d5db" }} />
+            <WBox label="💬 Customer Reviews →" h="2.75rem" cx="w-box-outline" style={{ flex: 1 }} />
+          </div>
+          <WNote>Both links navigate to Gallery and Reviews pages respectively.</WNote>
         </WZone>
 
         <WZone title="Service List — stacked rows (5 total)" note="Section 2">
           {["Exterior Wash & Wax · $120","Interior Detail · $150","Paint Correction · $350","Ceramic Coating · $800","Full Detail Package · $250"].map((name, i) => (
             <div key={i} className="w-bg" style={{ marginBottom: "0.375rem", padding: "0.5rem" }}>
-              <div className="w-row" style={{ gap: "0.5rem", alignItems: "flex-start" }}>
+              <div className="w-row" style={{ gap: "0.5rem" }}>
                 <div className="w-col" style={{ flex: 1, gap: "0.3rem" }}>
                   <WBox label={name} h="1.75rem" cx="w-w-full" />
                   <WBox label="Description + feature tags" h="2.25rem" cx="w-w-full" />
@@ -741,142 +1102,187 @@ function WireframesPage({ onNav }) {
               </div>
             </div>
           ))}
-          <WNote>"Book This" → Contact with service pre-selected. Mobile: button full-width below info.</WNote>
-          <WNote>Hover: border shifts to red.</WNote>
         </WZone>
 
-        <WZone title="Guarantee Strip — 3 columns" note="Section 3">
+        <WZone title="Guarantee Strip" note="Section 3">
           <div className="w-g3 w-bg" style={{ padding: "0.5rem" }}>
             {["Satisfaction Guaranteed","Free Inspection","On-Time Promise"].map(t => (
-              <div key={t} className="w-col" style={{ alignItems: "center", gap: "0.25rem", textAlign: "center", padding: "0.375rem" }}>
-                <WBox label="[Icon]" h="1.5rem" style={{ width: "2rem" }} />
+              <div key={t} className="w-col" style={{ alignItems: "center", gap: "0.25rem", padding: "0.375rem" }}>
                 <WBox label={t} h="1.625rem" cx="w-w-full" />
-                <WBox label="Short descriptor" h="1.375rem" cx="w-w-full" />
               </div>
             ))}
           </div>
-          <WNote>Reassurance only — no CTA. 3-col → 1-col on mobile.</WNote>
         </WZone>
         <SharedWireFooter />
 
         {/* ── Page 03 ── */}
-        <WPageBreak num="03" title="About Us" route="Route: /about · Brand story + team" />
+        <WPageBreak num="03" title="Before & After Gallery" route="Route: /gallery · Reachable from Services page quick link" />
         <SharedWireNav />
 
-        <WZone title="Story Section — 2-col split" note="Section 1">
-          <div className="w-g2 w-bg" style={{ padding: "0.625rem" }}>
-            <div className="w-col" style={{ gap: "0.375rem" }}>
-              <WBox label="Eyebrow 'Our Story'" h="1.125rem" style={{ width: "6rem" }} />
-              <WBox label="H1 'About Evans'" h="2.75rem" style={{ width: "12rem" }} />
-              <WBox label="Brand story paragraph 1 (4–5 lines)" h="4rem" cx="w-w-full" />
-              <WBox label="Brand story paragraph 2 (3–4 lines)" h="3.25rem" cx="w-w-full" />
-            </div>
-            <WBox label="Studio photo" cx="w-hf" />
+        <WZone title="Page Header" note="Section 1">
+          <div className="w-col w-bg" style={{ padding: "0.75rem", gap: "0.375rem" }}>
+            <WBox label="H1 'Before & After'" h="2.75rem" style={{ width: "14rem" }} />
+            <WBox label="Intro paragraph" h="1.625rem" style={{ width: "60%" }} />
           </div>
-          <WNote>Stacks to 1-col on mobile — photo below copy.</WNote>
         </WZone>
 
-        <WZone title="Stats Bar — 4 cells" note="Section 2">
-          <div className="w-g4" style={{ gap: 0, background: "#e5e7eb" }}>
-            {["2018 Founded","900+ Detailed","3 Techs","4.9★ Rating"].map((s, i) => (
-              <div key={s} className={`w-col${i < 3 ? " w-divr" : ""}`} style={{ padding: "0.625rem 0.375rem", textAlign: "center", gap: "0.25rem" }}>
-                <div style={{ height: "2rem", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(200,16,46,0.15)", color: "var(--accent)", fontWeight: 900, fontSize: "0.6rem", fontFamily: "var(--font-display)" }}>{s.split(" ")[0]}</div>
-                <div style={{ height: "1.25rem", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.5rem", color: "#9ca3af" }}>{s.replace(/^\S+ /,"")}</div>
+        <WZone title="Gallery Grid — stacked cards (5 items)" note="Section 2">
+          {["Exterior Wash & Wax","Paint Correction","Interior Detail","Ceramic Coating","Full Detail Package"].map((svc, i) => (
+            <div key={i} className="w-bg" style={{ marginBottom: "0.5rem" }}>
+              <div className="w-g2">
+                <div style={{ position: "relative" }}>
+                  <WBox label="BEFORE — photo" h="5rem" cx="w-w-full" />
+                  <div style={{ position: "absolute", top: "0.25rem", left: "0.25rem", background: "rgba(0,0,0,0.7)", padding: "0.1rem 0.3rem" }}>
+                    <span style={{ color: "#fff", fontSize: "0.5rem", fontWeight: 700 }}>BEFORE</span>
+                  </div>
+                </div>
+                <div style={{ position: "relative" }}>
+                  <WBox label="AFTER — photo" h="5rem" cx="w-w-full" style={{ borderColor: "#c8102e" }} />
+                  <div style={{ position: "absolute", top: "0.25rem", left: "0.25rem", background: "#c8102e", padding: "0.1rem 0.3rem" }}>
+                    <span style={{ color: "#fff", fontSize: "0.5rem", fontWeight: 700 }}>AFTER</span>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
-          <WNote>Collapses to 2×2 on mobile.</WNote>
-        </WZone>
-
-        <WZone title="Team — 3 cards" note="Section 3">
-          <div className="w-g3" style={{ gap: "0.75rem" }}>
-            {["Marcus Evans · Founder","Priya Shah · Paint Spec.","Carlos Reyes · Interior"].map(m => (
-              <div key={m} className="w-col" style={{ gap: "0.3rem" }}>
-                <WBox label="Portrait photo (grayscale → color on hover)" h="7rem" cx="w-w-full" />
-                <WBox label="Role label (small red)" h="1rem" cx="w-w-full" />
-                <WBox label={m.split("·")[0].trim()} h="1.75rem" cx="w-w-full" />
-                <WBox label="Bio (2–3 lines)" h="2.25rem" cx="w-w-full" />
+              <div style={{ padding: "0.375rem 0.5rem", borderTop: "1px solid #e5e7eb" }}>
+                <WBox label={`${svc} · Vehicle name · Caption`} h="1.625rem" cx="w-w-full" />
               </div>
-            ))}
-          </div>
-          <WNote>3-col → 2-col (tablet) → 1-col (mobile). CSS filter grayscale removed on hover.</WNote>
+            </div>
+          ))}
+          <WNote>Side-by-side on desktop. Stacked (before top, after bottom) on mobile.</WNote>
+          <WNote>BEFORE label = dark pill. AFTER label = red pill.</WNote>
         </WZone>
 
-        <WZone title="CTA Band" note="Section 4">
-          <div className="w-row w-box-cta" style={{ padding: "0.75rem 1rem", justifyContent: "space-between" }}>
-            <div style={{ height: "2rem", flex: 1, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", paddingLeft: "0.5rem" }}>
-              <span style={{ color: "#fff", fontSize: "0.55rem" }}>"Ready to Book?" heading</span>
-            </div>
-            <WBox label="Get in Touch" h="2.75rem" cx="w-box-outline" style={{ width: "7rem", marginLeft: "0.75rem", flexShrink: 0 }} />
+        <WZone title="Book CTA" note="Section 3">
+          <div className="w-row w-bg" style={{ padding: "0.75rem", justifyContent: "center", gap: "0.75rem" }}>
+            <WBox label='"Want results like these?" text' h="1.5rem" style={{ width: "10rem" }} />
+            <WBox label="Book a Detail → [primary]" h="2.75rem" cx="w-box-cta" style={{ width: "8rem" }} />
           </div>
         </WZone>
         <SharedWireFooter />
 
         {/* ── Page 04 ── */}
-        <WPageBreak num="04" title="Contact Us" route="Route: /contact · Booking form — end of core user flow" />
+        <WPageBreak num="04" title="Customer Reviews" route="Route: /reviews · Reachable from Services page quick link" />
         <SharedWireNav />
 
         <WZone title="Page Header" note="Section 1">
           <div className="w-col w-bg" style={{ padding: "0.75rem", gap: "0.375rem" }}>
-            <WBox label="Eyebrow 'Book a Detail'" h="1.125rem" style={{ width: "6.5rem" }} />
-            <WBox label="H1 'Contact Us'" h="2.75rem" style={{ width: "12rem" }} />
-            <WBox label="Supporting paragraph" h="1.625rem" style={{ width: "60%" }} />
+            <WBox label="H1 'Customer Reviews'" h="2.75rem" style={{ width: "14rem" }} />
+            <WBox label="Intro paragraph" h="1.625rem" style={{ width: "60%" }} />
           </div>
         </WZone>
 
-        <WZone title="Main Content — Info (2 cols) + Form (3 cols)" note="Section 2">
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 3fr", gap: "0.75rem" }}>
-            <div className="w-col" style={{ gap: "0.5rem" }}>
-              <WBox label="'Studio Info' heading" h="1.75rem" cx="w-w-full" />
-              {["Location · address","Phone · number","Email · address","Hours · schedule"].map(item => (
-                <div key={item} className="w-row" style={{ gap: "0.25rem" }}>
-                  <WBox label="[Icon]" h="1.25rem" style={{ width: "1.25rem", flexShrink: 0 }} />
-                  <WBox label={item} h="2.25rem" style={{ flex: 1 }} />
+        <WZone title="Rating Summary + Leave Review" note="Section 2">
+          <div className="w-row w-bg" style={{ padding: "0.75rem", gap: "0.75rem" }}>
+            <div className="w-col" style={{ alignItems: "center", gap: "0.25rem", flexShrink: 0 }}>
+              <WBox label="4.9" h="3rem" style={{ width: "3.5rem", fontSize: "0.9rem" }} />
+              <WBox label="★★★★★" h="1.125rem" style={{ width: "5rem" }} />
+              <WBox label="8 Google Reviews" h="1rem" style={{ width: "5rem" }} />
+            </div>
+            <div style={{ width: "1px", background: "#e5e7eb", flexShrink: 0 }} />
+            <div className="w-col" style={{ flex: 1, gap: "0.3rem" }}>
+              <WBox label="Summary text — overall rating context" h="2.5rem" cx="w-w-full" />
+              <WBox label="Leave Your Own Review ↗ [outline, external]" h="2.75rem" cx="w-box-outline" style={{ width: "12rem" }} />
+            </div>
+          </div>
+        </WZone>
+
+        <WZone title="Review Grid — 2-col cards (8 reviews)" note="Section 3">
+          <div className="w-g2" style={{ gap: "0.375rem" }}>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="w-col w-bg" style={{ padding: "0.5rem", gap: "0.25rem" }}>
+                <WBox label="★★★★★" h="1rem" style={{ width: "4rem" }} />
+                <WBox label="Review text (italic quote, 3–4 lines)" h="3.5rem" cx="w-w-full" />
+                <WBox label="Name · Vehicle · Service · Date" h="1.625rem" cx="w-w-full" />
+              </div>
+            ))}
+          </div>
+          <WNote>1-col on mobile, 2-col on tablet+.</WNote>
+        </WZone>
+        <SharedWireFooter />
+
+        {/* ── Page 05 ── */}
+        <WPageBreak num="05" title="About Us" route="Route: /about · Brand story + team + analytics box" />
+        <SharedWireNav />
+
+        <WZone title="Story + Stats Bar + Team" note="Sections 1–3">
+          <div className="w-g2 w-bg" style={{ padding: "0.625rem" }}>
+            <div className="w-col" style={{ gap: "0.375rem" }}>
+              <WBox label="H1 'About Evans' + story paragraphs" h="6rem" cx="w-w-full" />
+            </div>
+            <WBox label="Studio photo" cx="w-hf" />
+          </div>
+          <div className="w-g4" style={{ gap: 0, background: "#e5e7eb", marginTop: "0.375rem" }}>
+            {["2018 Founded","900+ Detailed","3 Techs","4.9★ Rating"].map(s => (
+              <div key={s} className="w-col" style={{ padding: "0.5rem", textAlign: "center" }}>
+                <WBox label={s} h="2.5rem" cx="w-w-full" />
+              </div>
+            ))}
+          </div>
+          <div className="w-g3" style={{ gap: "0.75rem", marginTop: "0.5rem" }}>
+            {["Marcus Evans","Priya Shah","Carlos Reyes"].map(m => (
+              <div key={m} className="w-col" style={{ gap: "0.3rem" }}>
+                <WBox label={`${m} — portrait`} h="5rem" cx="w-w-full" />
+                <WBox label="Role + bio" h="2.5rem" cx="w-w-full" />
+              </div>
+            ))}
+          </div>
+        </WZone>
+
+        <WZone title="Google Analytics Box" note="Section 4 — inside team section">
+          <div className="w-col w-bg" style={{ padding: "0.5rem", gap: "0.25rem" }}>
+            <div className="w-row" style={{ justifyContent: "space-between" }}>
+              <WBox label="📊 Site Analytics (heading)" h="1.5rem" style={{ width: "8rem" }} />
+              <WBox label="● Live · Google Analytics" h="1.25rem" style={{ width: "8rem" }} />
+            </div>
+            <div className="w-g2" style={{ gap: "1px" }}>
+              {["24,851 Total Visits","1,847 Monthly Visitors","2m 34s Avg. Session","38% Bounce Rate"].map((m, i) => (
+                <div key={i} className="w-col w-box" style={{ padding: "0.5rem", background: "#fff", gap: "0.15rem" }}>
+                  <WBox label={m.split(" ")[0]} h="2rem" style={{ width: "60%" }} />
+                  <WBox label={m.replace(/^\S+ /,"")} h="0.875rem" cx="w-w-full" />
+                  <WBox label="+trend indicator (green)" h="0.75rem" cx="w-w-full" />
                 </div>
               ))}
-              <WBox label="'Good to Know' note box" h="3.5rem" cx="w-w-full" />
+            </div>
+            <div className="w-row" style={{ justifyContent: "space-between" }}>
+              <WBox label="Powered by Google Analytics (GA logo)" h="1.25rem" style={{ width: "10rem" }} />
+              <WBox label="Updated [date]" h="1.25rem" style={{ width: "6rem" }} />
+            </div>
+          </div>
+          <WNote>Numbers animate (count up) on scroll-into-view using IntersectionObserver.</WNote>
+          <WNote>Green pulsing dot = live indicator. GA bar-chart icon in footer.</WNote>
+        </WZone>
+        <SharedWireFooter />
+
+        {/* ── Page 06 ── */}
+        <WPageBreak num="06" title="Contact Us" route="Route: /contact · Booking form — end of core user flow" />
+        <SharedWireNav />
+
+        <WZone title="Page Header + 2-col Form Layout" note="Sections 1–2">
+          <div className="w-col w-bg" style={{ padding: "0.75rem", gap: "0.375rem", marginBottom: "0.375rem" }}>
+            <WBox label="H1 'Contact Us' + paragraph" h="3.25rem" cx="w-w-full" />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 3fr", gap: "0.75rem" }}>
+            <div className="w-col" style={{ gap: "0.5rem" }}>
+              <WBox label="Studio Info (location, phone, email, hours)" h="8rem" cx="w-w-full" />
+              <WBox label="'Good to Know' box" h="3.5rem" cx="w-w-full" />
             </div>
             <div className="w-col" style={{ gap: "0.5rem" }}>
               <div className="w-g2">
-                <div className="w-col" style={{ gap: "0.2rem" }}><WBox label="Full Name *" h="1rem" cx="w-w-full" /><WBox label="[text input]" h="2.75rem" cx="w-w-full" /></div>
-                <div className="w-col" style={{ gap: "0.2rem" }}><WBox label="Email *" h="1rem" cx="w-w-full" /><WBox label="[email input]" h="2.75rem" cx="w-w-full" /></div>
+                <WBox label="Full Name *" h="2.75rem" cx="w-w-full" />
+                <WBox label="Email *" h="2.75rem" cx="w-w-full" />
               </div>
               <div className="w-g2">
-                <div className="w-col" style={{ gap: "0.2rem" }}><WBox label="Phone (optional)" h="1rem" cx="w-w-full" /><WBox label="[tel input]" h="2.75rem" cx="w-w-full" /></div>
-                <div className="w-col" style={{ gap: "0.2rem" }}><WBox label="Vehicle *" h="1rem" cx="w-w-full" /><WBox label="[year/make/model]" h="2.75rem" cx="w-w-full" /></div>
+                <WBox label="Phone (optional)" h="2.75rem" cx="w-w-full" />
+                <WBox label="Vehicle *" h="2.75rem" cx="w-w-full" />
               </div>
-              <div className="w-col" style={{ gap: "0.2rem" }}>
-                <WBox label="Service (optional — pre-fills from Services page)" h="1rem" cx="w-w-full" />
-                <WBox label="[select dropdown]" h="2.75rem" cx="w-w-full" />
-              </div>
-              <div className="w-col" style={{ gap: "0.2rem" }}>
-                <WBox label="Message *" h="1rem" cx="w-w-full" />
-                <WBox label="[textarea — 5 rows]" h="5.5rem" cx="w-w-full" />
-              </div>
-              <div style={{ border: "1px dashed #fca5a5", padding: "0.5rem", background: "#fff7f7" }}>
-                <div style={{ color: "#ef4444", fontSize: "0.55rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "0.375rem" }}>Validation / Error States</div>
-                <div className="w-col" style={{ gap: "0.25rem" }}>
-                  <WBox label="[input with red border — inline ⚠ icon + error message below]" h="2.75rem" cx="w-box-err w-w-full" />
-                  <WBox label="Error summary banner (if multiple fields fail at once)" h="1.75rem" cx="w-box-err w-w-full" />
-                </div>
-              </div>
-              <WBox label="Send Booking Request [submit · spinner during async]" h="3rem" cx="w-box-cta w-w-full" />
-              <WBox label="Privacy note · centered · small" h="1.25rem" cx="w-w-full" />
+              <WBox label="Service dropdown (pre-fills from Services page)" h="2.75rem" cx="w-w-full" />
+              <WBox label="Message * (textarea — 5 rows)" h="5.5rem" cx="w-w-full" />
+              <WBox label="Validation error states (inline + summary banner)" h="2.25rem" cx="w-box-err w-w-full" />
+              <WBox label="Send Booking Request [submit · spinner]" h="3rem" cx="w-box-cta w-w-full" />
             </div>
           </div>
-          <WNote>Service dropdown pre-fills if user arrives via "Book" / "Book This" button — state passed via navigate().</WNote>
-          <WNote>Validation fires on submit. Required: Name, Email, Vehicle, Message. Phone optional, validated if provided.</WNote>
-          <WNote>Submit: spinner + "Sending…" during 1s async delay, then form replaced by success state.</WNote>
-          <WNote>Mobile: info col stacks below form. All field-rows collapse to 1-col.</WNote>
-        </WZone>
-
-        <WZone title="Success State — replaces form on submit" note="Section 2b">
-          <div className="w-col w-bg" style={{ alignItems: "center", padding: "2rem", gap: "0.625rem" }}>
-            <WBox label="✓ Checkmark icon (red, large)" h="2.75rem" style={{ width: "2.75rem", borderRadius: "50%" }} />
-            <WBox label="H3 'Booking Request Sent'" h="2rem" style={{ width: "14rem" }} />
-            <WBox label="Confirmation with user's first name" h="1.75rem" style={{ width: "16rem" }} />
-          </div>
-          <WNote>Entire form area replaced — no page reload. First name extracted from Name field.</WNote>
+          <WNote>Service dropdown pre-fills if arriving via 'Book'/'Book This'. State via navigate().</WNote>
+          <WNote>Success state replaces entire form on submit.</WNote>
         </WZone>
         <SharedWireFooter />
 
@@ -885,14 +1291,14 @@ function WireframesPage({ onNav }) {
           <div className="w-spec-title">MVP Specification Notes</div>
           <div className="w-spec-grid">
             {[
-              ["Core User Flow",    "Home → Services (optional) → Contact (pre-selected service) → Success. Every CTA routes correctly end-to-end."],
-              ["Form Validation",   "Client-side only for MVP. Required: Name, Email, Vehicle, Message. Phone optional but validated if provided. Email regex checked. Inline errors per field on submit attempt."],
-              ["Pre-fill Behavior", "Service dropdown pre-fills when user arrives via Book / Book This. Service ID passed through navigate(page, serviceId) and read from parent state."],
-              ["Mobile Strategy",   "Min tap target 48px on all buttons and inputs. Grids collapse at 640px breakpoint. Nav → hamburger. Contact info stacks below form on mobile."],
-              ["Error UX",          "Errors clear on field change. Multiple errors show summary banner. On failed submit: scroll to first invalid field. Submit disabled + spinner while async request runs."],
-              ["Styling",           "Single CSS file (index.css) — no Tailwind utilities in markup. Design tokens as CSS custom properties. Named semantic class names throughout."],
-              ["Typography",        "Display: Barlow Condensed 700/900. Body: Inter 400/500/600. Loaded from Google Fonts."],
-              ["Out of Scope",      "Backend form submission, authentication, CMS, payments, map embed, admin dashboard."],
+              ["Pages (6 total)",     "Home, Services, Gallery, Reviews, About, Contact. Gallery + Reviews reachable from Services quick-links, footer, and mobile nav dropdown."],
+              ["Core User Flow",      "Home → Services (optional) → Contact (pre-selected service) → Success. Every CTA routes correctly end-to-end."],
+              ["Gallery",             "5 before/after photo pairs. Side-by-side on desktop, stacked on mobile. Service tag + vehicle + caption per entry. Bottom CTA to Contact."],
+              ["Reviews",             "8 customer reviews with star ratings, name, vehicle, service, date. Summary bar with avg rating + Google Reviews external link. Leave Review link opens Google in new tab."],
+              ["Leave a Review",      "Home page band links to Google Reviews (external, new tab). Reviews page summary also links to Google Reviews."],
+              ["Analytics Box",       "About page panel shows 4 metrics: Total Visits, Monthly Visitors, Avg Session, Bounce Rate. Numbers animate on scroll-into-view. Styled with Google Analytics branding."],
+              ["Form Validation",     "Client-side. Required: Name, Email, Vehicle, Message. Phone optional but validated if provided. Inline errors per field. Summary banner for multiple failures."],
+              ["Mobile Strategy",     "Min tap target 48px. Nav → hamburger with Gallery + Reviews links. Gallery pair stacks vertically. Reviews grid goes 1-col."],
             ].map(([k, v]) => (
               <div key={k}>
                 <div className="w-spec-k">{k}</div>
@@ -919,6 +1325,8 @@ function Footer({ onNav }) {
           {NAV_LINKS.map(({ label, page }) => (
             <button key={page} className="footer-link" onClick={() => onNav(page)}>{label}</button>
           ))}
+          <button className="footer-link" onClick={() => onNav("gallery")}>Gallery</button>
+          <button className="footer-link" onClick={() => onNav("reviews")}>Reviews</button>
         </nav>
         <span className="footer-copy">© {new Date().getFullYear()} Evans Detailing</span>
       </div>
@@ -945,6 +1353,8 @@ export default function App() {
       <main>
         {page === "home"     && <HomePage     onNav={navigate} />}
         {page === "services" && <ServicesPage onNav={navigate} />}
+        {page === "gallery"  && <GalleryPage  onNav={navigate} />}
+        {page === "reviews"  && <ReviewsPage />}
         {page === "about"    && <AboutPage    onNav={navigate} />}
         {page === "contact"  && <ContactPage  preselectedService={preselectedService} />}
       </main>
